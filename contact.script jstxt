@@ -1,0 +1,77 @@
+// ===== MUSIC PLAYER =====
+// Get all play buttons and audio elements
+const playButtons = document.querySelectorAll('.play-btn');
+const songItems = document.querySelectorAll('.song-item');
+
+// Track currently playing audio
+let currentlyPlaying = null;
+
+// Add click event to each play button
+playButtons.forEach(button => {
+    button.addEventListener('click', function() {
+        const trackName = this.getAttribute('data-track');
+        const audioId = `audio-${trackName}`;
+        const audio = document.getElementById(audioId);
+        const songItem = document.getElementById(`song-${trackName}`);
+        const playIcon = this.querySelector('.play-icon');
+        const pauseIcon = this.querySelector('.pause-icon');
+
+        // If something is already playing, stop it
+        if (currentlyPlaying && currentlyPlaying !== audio) {
+            currentlyPlaying.pause();
+            currentlyPlaying.currentTime = 0;
+
+            // Reset the previous button
+            const prevButton = document.querySelector(`[data-track="${currentlyPlaying.id.replace('audio-', '')}"]`);
+            if (prevButton) {
+                prevButton.querySelector('.play-icon').style.display = 'inline';
+                prevButton.querySelector('.pause-icon').style.display = 'none';
+            }
+
+            // Remove playing class from previous song
+            document.querySelectorAll('.song-item').forEach(item => {
+                item.classList.remove('playing');
+            });
+        }
+
+        // Toggle play/pause
+        if (audio.paused) {
+            audio.play();
+            currentlyPlaying = audio;
+            playIcon.style.display = 'none';
+            pauseIcon.style.display = 'inline';
+            songItem.classList.add('playing');
+        } else {
+            audio.pause();
+            playIcon.style.display = 'inline';
+            pauseIcon.style.display = 'none';
+            songItem.classList.remove('playing');
+        }
+
+        // Update progress bar as music plays
+        audio.addEventListener('timeupdate', function() {
+            const progressBar = songItem.querySelector('.progress-bar');
+            const percent = (audio.currentTime / audio.duration) * 100;
+            progressBar.style.width = percent + '%';
+        });
+
+        // Reset when song ends
+        audio.addEventListener('ended', function() {
+            playIcon.style.display = 'inline';
+            pauseIcon.style.display = 'none';
+            songItem.classList.remove('playing');
+            const progressBar = songItem.querySelector('.progress-bar');
+            progressBar.style.width = '0%';
+        });
+    });
+});
+
+// Click on progress bar to seek
+document.querySelectorAll('.progress-container').forEach((container, index) => {
+    container.addEventListener('click', function(e) {
+        const audio = document.querySelectorAll('audio')[index];
+        const rect = this.getBoundingClientRect();
+        const percent = (e.clientX - rect.left) / rect.width;
+        audio.currentTime = percent * audio.duration;
+    });
+});

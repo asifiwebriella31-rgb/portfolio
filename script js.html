@@ -1,0 +1,54 @@
+
+script js
+
+// ===== CAROUSEL FUNCTIONALITY =====
+
+// Get all carousel items and indicators
+const carouselItems = document.querySelectorAll('.carousel-item');
+const indicators = document.querySelectorAll('.indicator');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+
+let currentIndex = 0;
+
+// Function to show carousel item
+function showCarouselItem(index) {
+    // Remove active class from all items and indicators
+    carouselItems.forEach(item => item.classList.remove('active'));
+    indicators.forEach(indicator => indicator.classList.remove('active'));
+
+    // Add active class to current item and indicator
+    carouselItems[index].classList.add('active');
+    indicators[index].classList.add('active');
+
+    // Move carousel to show current item
+    const carousel = document.querySelector('.carousel');
+    carousel.style.transform = `translateX(-${index * 100}%)`;
+}
+
+// Function to go to next item
+function nextCarouselItem() {
+    currentIndex = (currentIndex + 1) % carouselItems.length;
+    showCarouselItem(currentIndex);
+}
+
+// Function to go to previous item
+function prevCarouselItem() {
+    currentIndex = (currentIndex - 1 + carouselItems.length) % carouselItems.length;
+    showCarouselItem(currentIndex);
+}
+
+// Event listeners for buttons
+nextBtn.addEventListener('click', nextCarouselItem);
+prevBtn.addEventListener('click', prevCarouselItem);
+
+// Event listeners for indicators
+indicators.forEach((indicator, index) => {
+    indicator.addEventListener('click', () => {
+        currentIndex = index;
+        showCarouselItem(currentIndex);
+    });
+});
+
+// Initialize carousel
+showCarouselItem(0);
